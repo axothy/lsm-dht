@@ -27,7 +27,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import static ru.vk.itmo.test.dht.dao.SSTableUtils.SS_TABLE_PRIORITY;
 import static ru.vk.itmo.test.dht.dao.SSTableUtils.sizeOf;
 
-public class NotOnlyInMemoryDao implements Dao<MemorySegment, Entry<MemorySegment>> {
+public class LSMDao implements Dao<MemorySegment, Entry<MemorySegment>> {
     private static final double BLOOM_FILTER_FPP = 0.03;
     private final SSTablesStorage ssTablesStorage;
     private final Config config;
@@ -61,7 +61,7 @@ public class NotOnlyInMemoryDao implements Dao<MemorySegment, Entry<MemorySegmen
         return comparator(entry1.key(), entry2.key());
     }
 
-    public NotOnlyInMemoryDao(Config config) {
+    public LSMDao(Config config) {
         this.config = config;
         arena = Arena.ofShared();
         Path path = config.basePath();
@@ -130,7 +130,7 @@ public class NotOnlyInMemoryDao implements Dao<MemorySegment, Entry<MemorySegmen
         iterators.add(new PeekingIteratorImpl<>(secondIterator, 0));
         iterators.add(new PeekingIteratorImpl<>(SSTablesStorage.iteratorsAll(segments, from, to), SS_TABLE_PRIORITY));
 
-        return new PeekingIteratorImpl<>(MergeIterator.merge(iterators, NotOnlyInMemoryDao::entryComparator));
+        return new PeekingIteratorImpl<>(MergeIterator.merge(iterators, LSMDao::entryComparator));
     }
 
     private PeekingIterator<Entry<MemorySegment>> iteratorForCompaction(List<MemorySegment> segments) {

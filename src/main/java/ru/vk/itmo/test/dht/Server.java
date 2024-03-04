@@ -5,7 +5,7 @@ import ru.vk.itmo.dao.BaseEntry;
 import ru.vk.itmo.dao.Config;
 import ru.vk.itmo.dao.Dao;
 import ru.vk.itmo.dao.Entry;
-import ru.vk.itmo.test.dht.dao.NotOnlyInMemoryDao;
+import ru.vk.itmo.test.dht.dao.LSMDao;
 
 import java.io.IOException;
 import java.lang.foreign.MemorySegment;
@@ -35,7 +35,7 @@ public final class Server {
         );
 
         Dao<MemorySegment, Entry<MemorySegment>> dao =
-                new NotOnlyInMemoryDao(new Config(config.workingDir(), 4_194_304L));
+                new LSMDao(new Config(config.workingDir(), 4_194_304L));
 
         ExecutorService executor = new ThreadPoolExecutor(
                 8,

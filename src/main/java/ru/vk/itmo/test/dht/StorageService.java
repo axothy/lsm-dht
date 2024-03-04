@@ -6,7 +6,7 @@ import ru.vk.itmo.dao.Config;
 import ru.vk.itmo.dao.Dao;
 import ru.vk.itmo.dao.Entry;
 import ru.vk.itmo.test.ServiceFactory;
-import ru.vk.itmo.test.dht.dao.NotOnlyInMemoryDao;
+import ru.vk.itmo.test.dht.dao.LSMDao;
 
 import java.io.IOException;
 import java.lang.foreign.MemorySegment;
@@ -32,7 +32,7 @@ public class StorageService implements Service {
     @Override
     public CompletableFuture<Void> start() throws IOException {
         //Dao opens here in order to make it able to reopen
-        this.dao = new NotOnlyInMemoryDao(new Config(config.workingDir(), FLUSH_THRESHOLD_BYTES));
+        this.dao = new LSMDao(new Config(config.workingDir(), FLUSH_THRESHOLD_BYTES));
         this.executor = new ThreadPoolExecutor(
                 POOL_SIZE,
                 POOL_SIZE,
