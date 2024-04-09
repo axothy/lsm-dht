@@ -225,7 +225,6 @@ class SingleNodeTest extends TestBase {
         assertEquals(HttpURLConnection.HTTP_CREATED, service.upsert(key, value).statusCode());
         assertArrayEquals(value, service.get(key).body());
 
-
         // Restart
         service.stop();
         service.start();

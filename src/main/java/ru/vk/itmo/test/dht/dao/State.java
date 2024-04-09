@@ -11,7 +11,7 @@ import java.util.SortedMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 public final class State {
-    private static final Comparator<MemorySegment> comparator = LSMDao::comparator;
+    private static final Comparator<MemorySegment> comparator = NotOnlyInMemoryDao::comparator;
     private final SortedMap<MemorySegment, Entry<MemorySegment>> readEntries;
     private final SortedMap<MemorySegment, Entry<MemorySegment>> writeEntries;
     private final List<MemorySegment> sstables;
@@ -31,8 +31,7 @@ public final class State {
     }
 
     public static State initial(List<MemorySegment> segments) {
-        return new State(createMap(), createMap(), segments
-        );
+        return new State(createMap(), createMap(), segments);
     }
 
     public State compact(MemorySegment compacted) {

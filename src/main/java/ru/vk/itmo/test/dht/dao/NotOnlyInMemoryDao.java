@@ -27,7 +27,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import static ru.vk.itmo.test.dht.dao.SSTableUtils.SS_TABLE_PRIORITY;
 import static ru.vk.itmo.test.dht.dao.SSTableUtils.sizeOf;
 
-public class LSMDao implements Dao<MemorySegment, Entry<MemorySegment>> {
+public class NotOnlyInMemoryDao implements Dao<MemorySegment, Entry<MemorySegment>> {
     private static final double BLOOM_FILTER_FPP = 0.03;
     private final SSTablesStorage ssTablesStorage;
     private final Config config;
@@ -61,7 +61,7 @@ public class LSMDao implements Dao<MemorySegment, Entry<MemorySegment>> {
         return comparator(entry1.key(), entry2.key());
     }
 
-    public LSMDao(Config config) {
+    public NotOnlyInMemoryDao(Config config) {
         this.config = config;
         arena = Arena.ofShared();
         Path path = config.basePath();
@@ -88,11 +88,11 @@ public class LSMDao implements Dao<MemorySegment, Entry<MemorySegment>> {
 
         Entry<MemorySegment> result = currState.getWriteEntries().get(key);
         if (result != null) {
-            return result.value() == null ? null : result;
+            return result;
         }
         result = currState.getReadEntries().get(key);
         if (result != null) {
-            return result.value() == null ? null : result;
+            return result;
         }
 
         return getFromDisk(key, currState);
@@ -130,7 +130,7 @@ public class LSMDao implements Dao<MemorySegment, Entry<MemorySegment>> {
         iterators.add(new PeekingIteratorImpl<>(secondIterator, 0));
         iterators.add(new PeekingIteratorImpl<>(SSTablesStorage.iteratorsAll(segments, from, to), SS_TABLE_PRIORITY));
 
-        return new PeekingIteratorImpl<>(MergeIterator.merge(iterators, LSMDao::entryComparator));
+        return new PeekingIteratorImpl<>(MergeIterator.merge(iterators, NotOnlyInMemoryDao::entryComparator));
     }
 
     private PeekingIterator<Entry<MemorySegment>> iteratorForCompaction(List<MemorySegment> segments) {
@@ -210,7 +210,7 @@ public class LSMDao implements Dao<MemorySegment, Entry<MemorySegment>> {
 
         long newBloomFilterLength = BloomFilter.bloomFilterLength(entryCount, BLOOM_FILTER_FPP);
 
-        sizeForCompaction += 2L * Long.BYTES * nonEmptyEntryCount;
+        sizeForCompaction += 3L * Long.BYTES * nonEmptyEntryCount;
         sizeForCompaction += 3L * Long.BYTES + Long.BYTES * nonEmptyEntryCount; //for metadata (header + key offsets)
         sizeForCompaction += Long.BYTES * newBloomFilterLength; //for bloom filter
 
