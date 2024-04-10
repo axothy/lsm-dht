@@ -182,7 +182,7 @@ Transfer/sec:      2.56MB
 
 На гистограмме распределении времен ответа, построенной по результатам вывода wrk2 выше, видна деградация:
 
-![](../wrk_results/stage1/upsert-max-rps.png)
+![alt text](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage1/upsert-max-rps.png)
 
 Таким образом, будем считать в данном исследовании стабильной нагрузку около 30 000 rps. Нагрузим стабильно в течение 120 секунд:
 
