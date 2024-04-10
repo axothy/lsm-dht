@@ -203,6 +203,7 @@ Transfer/sec:      1.92MB
 ```
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage1/upsert-stable-rps.png)
+<img width="1463" alt="upsert-stable-rps" src="https://github.com/axothy/lsm-dht/assets/61747868/b6e72514-ce34-4b1e-bfde-5c71387a150e">
 
 Видим что среднее Latency - 0.81 ms, а по перцентилям гистограммы выше видно, что деградации не наблюдалось.
 
@@ -450,6 +451,7 @@ Transfer/sec:      1.64MB
 # 1) ALLOC
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage1/bf-get-20krps-alloc.png)
+<img width="1710" alt="bf-get-20krps-alloc" src="https://github.com/axothy/lsm-dht/assets/61747868/b7ed5b23-fbd5-4677-a954-3740f24e19fa">
 
 
 Около 80% аллокаций приходится на метод getFromDisk(), а он содержит в себе метод вычисления хеш-функции Murmur3 Hash для ключей. Это используется в фильтре Блума, чтобы определить, лежит ли в данном SSTable такой ключ или нет, для этого вычисляется хеш.
@@ -457,6 +459,7 @@ Transfer/sec:      1.64MB
 # 2) CPU
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage1/bf-get-20krps-cpu.png)
+<img width="1710" alt="bf-get-20krps-cpu" src="https://github.com/axothy/lsm-dht/assets/61747868/84c20a7b-64ae-4018-947a-90edd8293e0a">
 
 Из этого результата профилирования видно что много ресурсов cpu тратится на работу селекторов. На уровне базы данных - все тот же метод getFromDisk() является труднозатратным.
 
@@ -467,12 +470,14 @@ Transfer/sec:      1.64MB
 # 1) ALLOC
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage1/upsert-30krps-alloc.png)
+<img width="1708" alt="upsert-30krps-alloc" src="https://github.com/axothy/lsm-dht/assets/61747868/a7af7577-7644-4967-8730-7613ef41cbf2">
 
 Видно что много аллокаций приходится на SSTablesStorage.write - это как раз сброс данных с memtable на диск. При этом большинство аллокаций возникают в SSTablesStorage.getPaths(). Поскольку этот метод нужен был только для подсчета количества таблиц на диске, метод можно убрать и использовать просто переменную int sstablesCount, которая будет инкрементироваться c каждым flush и становиться равной единице после завершения compaction.
 
 # 2) CPU
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/upsert-30krps-cpu.png)
+<img width="1705" alt="upsert-30krps-cpu" src="https://github.com/axothy/lsm-dht/assets/61747868/04d05a99-8d29-4dbc-b103-1fcf9f19e719">
 
 Видно, что затраты процессора вызывает flush (метод SSTablesStorage.write). Метод SSTablesStorage.getPaths() был убран в целях оптимизации.
 
@@ -548,14 +553,17 @@ N_потоков = 8 * 0.8 * (1 + 10/5) = 19,2 то есть 20 потоков. 
 Построим график зависимости latency от pool size. В
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage2/latency(threads).png)
+<img width="1585" alt="latency(threads)" src="https://github.com/axothy/lsm-dht/assets/61747868/b8f353ee-0202-4c88-907f-a826fa2c111b">
 
 Тот же график, только с исключением значения 64 по оси x для более детальной визуализации.
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage2/latency(threads)2.png)
+<img width="1588" alt="latency(threads)2" src="https://github.com/axothy/lsm-dht/assets/61747868/b0b6ab2c-5901-4a02-be3a-d0f2ff8cc6f8">
 
 Отсюда вывод, что значение количества потоков, рассчитаное нами по приближенной формуле дает хороший результ. После нагрузочного тестирования было определено оценочное значения для размера пула потоков и оно равняется 20. Исключим из графика кривую MAX LATENCY, чтобы более подробно рассмотреть кривые перцентилей.
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage2/latency(threads)3.png)
+<img width="1577" alt="latency(threads)3" src="https://github.com/axothy/lsm-dht/assets/61747868/b4a5e358-a842-4002-9e98-2e198aa7bae8">
 
 Теперь кривые перцентилей видно лучше.
 
@@ -575,10 +583,12 @@ N_потоков = 8 * 0.8 * (1 + 10/5) = 19,2 то есть 20 потоков. 
 Из результатов тестирования видно, что слишком маленькая очередь (32) и слишком большая (512) приводят к тому, что сервер захлебывается.
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage2/latency(queue size).png)
+<img width="1586" alt="latency(queue size)" src="https://github.com/axothy/lsm-dht/assets/61747868/7439082d-93d8-4453-ba63-d4b5cbcb70aa">
 
 Тот же график, только в логарифмическом масштабе
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage2/latency(queue size)2.png)
+<img width="1582" alt="latency(queue size)2" src="https://github.com/axothy/lsm-dht/assets/61747868/5571b06d-01d0-49a3-9702-68f96e0eb2bb">
 
 Таким образом, приемлемой будет для нас значит очередь размера 128-256. Ниже вывод wrk2 при нагрузке в 100k rps в 64 соединения и 4 треда на сервер с пулом потоков 20 и очередью 128:
 
@@ -735,18 +745,21 @@ Transfer/sec:      6.55MB
 #### PUT, cpu
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage2/profile-put-cpu.png)
+<img width="1705" alt="profile-put-cpu" src="https://github.com/axothy/lsm-dht/assets/61747868/8718e253-5b2a-4038-9597-2c2ea3f65268">
 
 Если смотреть на профиль CPU, то видно что ресурсы процессора тратятся на работу ThreadPoolExecutor. Если смотреть дальше - то видно, что ресурсы процессора тратятся на ArrayBlockingQueue take() (~15%) для взятия задачи. Но это мало по сравнению с тем, какую пропускную способность дает ThreadPoolExecutor. Все точно также на профиле виден затрат ресурсов процессора на флаш, как и в прошлом этапе.
 
 #### PUT, alloc
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage2/profile-put-alloc.png)
+<img width="1709" alt="profile-put-alloc" src="https://github.com/axothy/lsm-dht/assets/61747868/1f3b0e39-cdd5-447b-845c-7ca18ec3f5c7">
 
 Сравнивая профиль с прошлым этапом, здесь мало что изменилось. Также на этом этапе были пофикшены аллокации в одном месте, где использовались стримы во время флаша для подсчета количества имеющихся sstable на диске. Теперь стримов нет и аллокаций соответственно тоже.
 
 #### PUT, lock
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage2/profile-put-lock.png)
+<img width="1708" alt="profile-put-lock" src="https://github.com/axothy/lsm-dht/assets/61747868/2a34b548-2d2a-4bb7-af2c-2854edfa32bd">
 
 Видно, что локи возникают в ArrayBlockingQueue (а также есть еще ReentrantReadWriteLock при upsert в dao - он был и в синхронной реализации).
 ThreadPoolExecutor - 83.19% локов, SelectorThread - 16.81% локов.
@@ -755,18 +768,21 @@ ThreadPoolExecutor - 83.19% локов, SelectorThread - 16.81% локов.
 #### GET, cpu
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage2/profile-get-cpu.png)
+<img width="1710" alt="profile-get-cpu" src="https://github.com/axothy/lsm-dht/assets/61747868/926fa2a8-e14e-4674-b96f-b3cde9880ced">
 
 Снова видна работа ThreadPoolExecutor появившегося в асинхронной реализации.
 
 #### GET, alloc
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage2/profile-get-alloc.png)
+<img width="1710" alt="profile-get-alloc" src="https://github.com/axothy/lsm-dht/assets/61747868/62175af7-19e1-4a83-a820-902b5cd319ec">
 
 Визуально - на профилей отличий нет, если сравнивать с синхронной реализацией.
 
 #### GET, lock
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage2/profile-get-lock.png)
+<img width="1710" alt="profile-get-lock" src="https://github.com/axothy/lsm-dht/assets/61747868/1ded39b6-019f-4b9e-ab75-600da575ed07">
 
 Здесь локов у ThreadPoolExecutor и SelectorThread 55 на 45.
 
@@ -900,10 +916,12 @@ Latency Distribution (HdrHistogram - Recorded Latency)
 Профиль приложения под PUT-нагрузкой, CPU:
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage3/imgs/profile-test-put-cpu-v1.png)
+<img width="1694" alt="profile-test-put-cpu-v1" src="https://github.com/axothy/lsm-dht/assets/61747868/0eb0a385-0e91-4e3d-87f3-8285b6630ac7">
 
 Профиль приложения под PUT-нагрузкой, alloc:
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage3/imgs/profile-test-put-alloc-v1.png)
+<img width="1707" alt="profile-test-put-alloc-v1" src="https://github.com/axothy/lsm-dht/assets/61747868/292b2ffb-b75f-4362-8844-082ef7c3470a">
 
 Из профилей выше видно, что в методе `selectPartition()` есть аллокации (7.35%), где в методе `fromString()` происходит 3.33% из них. Это метод, который из строки получает MemorySegment а далее хеширует сегмент:
 
@@ -916,6 +934,7 @@ Latency Distribution (HdrHistogram - Recorded Latency)
 Избавимся от него, таким образом будем хешировать сразу строку вместо MemorySegment. Отпрофилируем заново в аналогичных условиях:
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage3/imgs/profile-test-put-alloc-v2.png)
+<img width="1703" alt="profile-test-put-alloc-v2" src="https://github.com/axothy/lsm-dht/assets/61747868/c4da8b13-956f-418c-a953-17c48f967d7e">
 
 Таким образом, после оптимизации я сократил аллокации возникающие в алгоритме хеширования с 7.35% до 3.78%.
 
@@ -928,36 +947,42 @@ Latency Distribution (HdrHistogram - Recorded Latency)
 #### PUT, cpu
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage3/imgs/profile-put-cpu.png)
+<img width="1709" alt="profile-put-cpu" src="https://github.com/axothy/lsm-dht/assets/61747868/28d7a936-a580-4906-93f5-c5f42e88275f">
 
 Сравнивая данный профиль с нераспределенной версией, к тред пулу и селектор тредам добавляется `HttpClientImpl$SelectorManager`, достающий из очереди задачи клиента. Также добавляются `InternalWriteSubscriber` и `SequentialScheduler.SchedulableTask` из пакета `jdk.http`.
 
 #### PUT, alloc
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage3/imgs/profile-put-alloc.png)
+<img width="1710" alt="profile-put-alloc" src="https://github.com/axothy/lsm-dht/assets/61747868/013ed968-dffb-4c2e-9261-c2a597d2f1f7">
 
 Сравнивая данный профиль с нераспределенной версией, очевидно появились аллокации в селектор треде связанные с проксированием запроса другой ноде.
 
 #### PUT, lock
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage3/imgs/profile-put-lock.png)
+<img width="1710" alt="profile-put-lock" src="https://github.com/axothy/lsm-dht/assets/61747868/8b20502f-ce98-446f-9b02-b20a056d4614">
 
 Сравнивая данный профиль с нераспределенной версией, где в SelectorThread было 16.81% локов, сейчас их там всего 1.94%. Но добавилось 14.79% локов в `HttpClientImpl$SelectorManager`.
 
 #### GET, cpu
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage3/imgs/profile-get-cpu.png)
+<img width="1710" alt="profile-get-cpu" src="https://github.com/axothy/lsm-dht/assets/61747868/281eff83-56ce-4d13-bc6a-9dae3ecdeeeb">
 
 Сравнивая данный профиль с нераспределенной версией, как и в PUT-запросал появился `HttpClientImpl$SelectorManager`.
 
 #### GET, alloc
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage3/imgs/profile-get-alloc.png)
+<img width="1710" alt="profile-get-alloc" src="https://github.com/axothy/lsm-dht/assets/61747868/8edc3690-4532-45f5-b977-5546b3b358c6">
 
 
 
 #### GET, lock
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage3/imgs/profile-get-lock.png)
+<img width="1710" alt="profile-get-lock" src="https://github.com/axothy/lsm-dht/assets/61747868/472896d2-0344-434c-b829-f1447010e2ec">
 
 
 
@@ -1122,6 +1147,7 @@ Latency сильно просел, теперь точка разладки дл
 #### PUT, cpu
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage4/imgs/profile-cpu-put.png)
+<img width="1710" alt="profile-cpu-put" src="https://github.com/axothy/lsm-dht/assets/61747868/b75ec8d8-5916-4618-a2cd-3095c84803ad">
 
 Сравнивая данный профиль с версией без репликации, особых отличий нет, единственное, на профиле cpu реплицированной
 версии видно, что ThreadPoolExecutor выполняет еще и отправку запросов другим нодам, помимо локальной обработки запроса.
@@ -1130,6 +1156,7 @@ Latency сильно просел, теперь точка разладки дл
 #### PUT, alloc
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage4/imgs/profile-alloc-put.png)
+<img width="1710" alt="profile-alloc-put" src="https://github.com/axothy/lsm-dht/assets/61747868/36cdc07a-1549-4f6b-a7fe-6dff0f807545">
 
 Сравнивая данный профиль с версией без репликации, особых отличий не наблюдается.
 Заметно, что в SelectorThread аллокации увеличились примерно на 2%. Это связано с методом
@@ -1139,6 +1166,7 @@ Latency сильно просел, теперь точка разладки дл
 #### PUT, lock
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage4/imgs/profile-lock-put.png)
+<img width="1709" alt="profile-lock-put" src="https://github.com/axothy/lsm-dht/assets/61747868/ad1dee07-eced-401c-b576-1b8908f258aa">
 
 Видно что в версии с репликацией значительно добавились локи при обработке запроса.
 Можно улучшить данное решение, если внутреннее сетевое взаимодействие узлов сделать асинхронным,
@@ -1149,12 +1177,14 @@ Latency сильно просел, теперь точка разладки дл
 #### GET, cpu
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage4/imgs/profile-cpu-get.png)
+<img width="1710" alt="profile-cpu-get" src="https://github.com/axothy/lsm-dht/assets/61747868/f9e4507e-6a1e-4aa1-a93d-c99663ca298b">
 
 Особых изменений не наблюдается.
 
 #### GET, alloc
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage4/imgs/profile-alloc-get.png)
+<img width="1706" alt="profile-alloc-get" src="https://github.com/axothy/lsm-dht/assets/61747868/9a557553-9a0e-4dd5-9462-c91da662c2b2">
 
 Здесь хорошо заметно что увеличились аллокации в пуле воркеров, связано это с общением с другими нодами.
 Касательно того что под капотом Dao: во время профилирования база нагружалась
@@ -1163,6 +1193,7 @@ GET-запросами с `ack/from = 2/3`, соответственно зде�
 #### GET, lock
 
 ![](/Users/axothy/IdeaProjects/lsm-dht/src/main/java/ru/vk/itmo/test/dht/wrk_results/stage4/imgs/profile-lock-get.png)
+<img width="1710" alt="profile-lock-get" src="https://github.com/axothy/lsm-dht/assets/61747868/79aaf962-dff3-4fa4-a5c0-eed7ef3f0dd7">
 
 Опять же появилось больше локов, связанных с общением нод.
 
